@@ -1,0 +1,166 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Table, Pagination } from 'antd';
+import debounce from 'lodash/debounce';
+import SearchForm, { IItems } from './search-form'
+import CascaderTree from './components/cascader-tree'
+
+interface IListItem {
+  id: number
+  a: string
+  b: string
+}
+
+const Index = () => {
+  const [loading, setLoading] = useState<boolean>(false)
+  const [pageNo, setPageNo] = useState<number>(1)
+  const [pageSize, setPageSize] = useState<number>(10)
+  const [list, setList] = useState<IListItem[]>([])
+  const [total, setTotal] = useState<number>(0);
+  const [bodyHeight, setBodyHeight] = useState<number>(document.body.clientHeight)
+
+
+  /** 筛选条件 */
+  const items: IItems[] = useMemo(() => {
+    return [
+      {
+        type: 'input',
+        propKey: 'a',
+        placeholder: '名称1',
+      },
+      {
+        type: 'select',
+        propKey: 'b',
+        placeholder: '类型',
+        options: [
+          { label: '失败', value: 'fail' },
+          { label: '成功', value: 'success' },
+        ],
+      },
+      {
+        component: CascaderTree,
+        propKey: 'c',
+        placeholder: '客户类型',
+      },
+      {
+        type: 'datePicker',
+        propKey: 'd',
+        placeholder: '名称d',
+      },
+      {
+        type: 'checkbox',
+        propKey: 'e',
+        options: [
+          { label: '未做', value: '0' },
+          { label: '已完成', value: '1' },
+        ],
+      },
+    ]
+  }, [])
+  /** table 列头 */
+  const columns = useMemo(() => {
+    return [
+      {
+        dataIndex: 'a',
+        title: '名称',
+      },
+      {
+        dataIndex: 'b',
+        title: '类型',
+      }
+    ]
+  }, [])
+  /** 修改筛选条件 */
+  const onUpdateSearchForm = useCallback((data) => {
+    const { x, ...lastProps } = data;
+    return {
+      // a: a ? a + '——字段若是数组对象等，可取中某个值' : '',
+      x: 1,
+      ...lastProps
+    }
+  }, [])
+  /** 更新页码（置为默认） */
+  const onUpdatePage = useCallback(() => {
+    setPageNo(1)
+    setPageSize(10)
+  }, [])
+  /** 更新页码 */
+  const changePageSize = useCallback((pageNo, pageSize) => {
+    setPageNo(pageNo)
+    setPageSize(pageSize)
+  }, [])
+  /** 获取数据 */
+  const getList = useCallback((data) => {
+    setLoading(true)
+    const _params = {
+      pageNo,
+      pageSize,
+      ...data
+    }
+    setTimeout(() => {
+      console.log('_params:', _params)
+      let data = [
+        { id: 1, a: '张三', b: 'success' },
+        { id: 2, a: '李四', b: 'fail' },
+        { id: 3, a: '王五', b: 'success' }
+      ]
+      setList(data)
+      setTotal(100)
+      setLoading(false)
+    }, 1000)
+  }, [pageNo, pageSize])
+  /** 屏幕缩放 */
+  const windowScroll = useCallback(() => {
+    setBodyHeight(document.body.clientHeight)
+  }, [])
+
+  useEffect(() => {
+    windowScroll()
+    window.addEventListener('resize', debounce(windowScroll, 500))
+    return () => {
+      window.removeEventListener('resize', windowScroll)
+    }
+  }, [])
+
+  return (
+    <div>
+      <h2>动态筛选条件</h2>
+      <SearchForm
+        items={items}
+        onUpdatePage={onUpdatePage}
+        onUpdateSearchForm={onUpdateSearchForm}
+        onQuery={getList}
+        pageNo={pageNo}
+        pageSize={pageSize}
+        onReset={() => {
+          setPageNo(1);
+          setPageSize(10);
+        }}
+        defaultQuery={{ b: 'success' }}
+      />
+      <div style={{ height: bodyHeight - 150, border: '1px solid #f00' }}>
+        <Table
+          rowKey='id'
+          columns={columns}
+          dataSource={list}
+          pagination={false}
+          loading={loading}
+          scroll={{
+            y: bodyHeight - 216
+          }}
+        />
+      </div>
+      <Pagination
+        current={pageNo}
+        pageSize={pageSize}
+        total={total}
+        showTotal={() => `共 ${total} 条`}
+        showSizeChanger
+        showQuickJumper
+        onChange={(pageNo) => setPageNo(pageNo)}
+        onShowSizeChange={changePageSize}
+      />
+    </div>
+  )
+}
+
+export default Index;

@@ -1,0 +1,10 @@
+.search{
+    .search-item{
+      width:240px;
+      display: inline-block;
+      margin-right: 20px;
+      .ant-select, .ant-picker{
+        width:100%;
+      }
+    }
+  }
