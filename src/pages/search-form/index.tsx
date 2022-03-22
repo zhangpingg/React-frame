@@ -11,13 +11,14 @@ interface IListItem {
 }
 
 const Index = () => {
+  const defaultParams = {b: 'success'};
   const [loading, setLoading] = useState<boolean>(false)
+  const [params, setParams] = useState({})
   const [pageNo, setPageNo] = useState<number>(1)
   const [pageSize, setPageSize] = useState<number>(10)
   const [list, setList] = useState<IListItem[]>([])
   const [total, setTotal] = useState<number>(0);
   const [bodyHeight, setBodyHeight] = useState<number>(document.body.clientHeight)
-
 
   /** 筛选条件 */
   const items: IItems[] = useMemo(() => {
@@ -69,8 +70,21 @@ const Index = () => {
       }
     ]
   }, [])
+  /** 获取数据 */
+  const getList = useCallback((params) => {
+    setLoading(true)
+    console.log('params:', params)
+    let data = [
+      { id: 1, a: '张三', b: 'success' },
+      { id: 2, a: '李四', b: 'fail' },
+      { id: 3, a: '王五', b: 'success' }
+    ]
+    setList(data)
+    setTotal(100)
+    setLoading(false)
+  }, [])
   /** 修改筛选条件 */
-  const onUpdateSearchForm = useCallback((data) => {
+  const updateScreen = useCallback((data) => {
     const { x, ...lastProps } = data;
     return {
       // a: a ? a + '——字段若是数组对象等，可取中某个值' : '',
@@ -78,36 +92,44 @@ const Index = () => {
       ...lastProps
     }
   }, [])
-  /** 更新页码（置为默认） */
-  const onUpdatePage = useCallback(() => {
+  /** 切换页数*/
+  const changePageNo = useCallback((index, size) => {
+    setPageNo(index)
+    let _params = {
+      pageNo: index,
+      pageSize: size,
+      ...params
+    }
+    getList(_params)
+  }, [pageSize, params])
+  /** 更新页码 */
+  const changePageSize1 = useCallback((index, size) => {
+    setPageNo(index)
+    setPageSize(size)
+  }, [params])
+  /** 查询 */
+  const search = useCallback(async (data) => {
+    setParams(data);
     setPageNo(1)
     setPageSize(10)
-  }, [])
-  /** 更新页码 */
-  const changePageSize = useCallback((pageNo, pageSize) => {
-    setPageNo(pageNo)
-    setPageSize(pageSize)
-  }, [])
-  /** 获取数据 */
-  const getList = useCallback((data) => {
-    setLoading(true)
-    const _params = {
-      pageNo,
-      pageSize,
+    let _params = {
+      pageNo: 1,
+      pageSize: 10,
       ...data
     }
-    setTimeout(() => {
-      console.log('_params:', _params)
-      let data = [
-        { id: 1, a: '张三', b: 'success' },
-        { id: 2, a: '李四', b: 'fail' },
-        { id: 3, a: '王五', b: 'success' }
-      ]
-      setList(data)
-      setTotal(100)
-      setLoading(false)
-    }, 1000)
-  }, [pageNo, pageSize])
+    getList(_params)
+  }, [pageNo, pageSize]);
+  /** 重置 */
+  const reset = useCallback(() => {
+    setPageNo(1);
+    setPageSize(10);
+    let _params = {
+      pageNo: 1,
+      pageSize: 10,
+      ...defaultParams
+    }
+    getList(_params)
+  }, []);
   /** 屏幕缩放 */
   const windowScroll = useCallback(() => {
     setBodyHeight(document.body.clientHeight)
@@ -126,16 +148,10 @@ const Index = () => {
       <h2>动态筛选条件</h2>
       <SearchForm
         items={items}
-        onUpdatePage={onUpdatePage}
-        onUpdateSearchForm={onUpdateSearchForm}
-        onQuery={getList}
-        pageNo={pageNo}
-        pageSize={pageSize}
-        onReset={() => {
-          setPageNo(1);
-          setPageSize(10);
-        }}
-        defaultQuery={{ b: 'success' }}
+        onUpdateScreen={updateScreen}
+        onSearch={search}
+        onReset={reset}
+        defaultParams={defaultParams}
       />
       <div style={{ height: bodyHeight - 150, border: '1px solid #f00' }}>
         <Table
@@ -156,8 +172,9 @@ const Index = () => {
         showTotal={() => `共 ${total} 条`}
         showSizeChanger
         showQuickJumper
-        onChange={(pageNo) => setPageNo(pageNo)}
-        onShowSizeChange={changePageSize}
+        pageSizeOptions={[10, 20, 30, 40, 50]}
+        onChange={changePageNo}
+        onShowSizeChange={changePageSize1}
       />
     </div>
   )

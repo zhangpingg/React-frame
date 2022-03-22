@@ -13,49 +13,36 @@ export interface IItems {
 }
 interface IProps {
   items: IItems[]
-  onUpdateSearchForm: (data: any) => void
-  onUpdatePage: () => void
-  onQuery: (data: any) => void
-  pageNo?: number
-  pageSize?: number
+  onUpdateScreen: (data: object) => void
+  onSearch: (data: object) => void
   onReset?: () => void
-  defaultQuery?: object
+  defaultParams?: object
 }
 
 const Index: React.FC<IProps> = (props) => {
-  const { defaultQuery = {} } = props
-  const [formData, dispatch] = useReducer((prev: any, data: any) => (data ? { ...prev, ...data } : defaultQuery), defaultQuery);
+  const { defaultParams = {} } = props
+  const [formData, dispatch] = useReducer((prev: any, data: any) => (data ? { ...prev, ...data } : defaultParams), defaultParams);
   const [searchData, setSearchData] = useReducer(
-    (prev: any, data: any) => (data ? { ...prev, ...data } : props.onUpdateSearchForm(defaultQuery)),
-    props.onUpdateSearchForm(defaultQuery),
+    (prev: any, data: any) => (data ? { ...prev, ...data } : props.onUpdateScreen(defaultParams)),
+    props.onUpdateScreen(defaultParams),
   )
 
   /** formData 数据改变时，修改真正筛选条件字段 */
   useUpdateEffect(() => {
-    setSearchData(props.onUpdateSearchForm(formData))
-  }, [formData])
-  /** 当 pageNo 改变时，重新获取数据 */
-  useUpdateEffect(() => {
-    props.onQuery({ ...{ pageNo: props.pageNo, pageSize: props.pageSize }, ...searchData })
-  }, [props.pageNo, props.pageSize])
+    setSearchData(props.onUpdateScreen(formData))
+  }, [formData]);
   /** 查询 */
   const search = useCallback(() => {
-    props.onUpdatePage();
-    if (props.pageNo === 1 && props.pageSize === 10) {
-      props.onQuery(searchData)
-    }
-  }, [searchData, props.pageNo, props.pageSize])
+    props.onSearch(searchData)
+  }, [searchData])
   /** 重置 */
   const reset = useCallback(() => {
     dispatch(null)
-    props?.onReset?.()
-    setTimeout(() => {
-      search()
-    }, 0)
+    props?.onReset?.();
   }, [])
 
   useEffect(() => {
-    props.onQuery(searchData)
+    search();
   }, [])
 
   return (
