@@ -1,10 +1,32 @@
-.search{
-    .search-item{
-      width:240px;
-      display: inline-block;
-      margin-right: 20px;
-      .ant-select, .ant-picker{
-        width:100%;
+.SF {
+  padding: 10px;
+  background-color: var(--xc-component-background);
+  .SF-item {
+    display: flex;
+    margin-bottom: 10px;
+    .SF-item-label {
+      flex: 0 0 100px;
+      text-align: right;
+      line-height: 26px;
+      padding-right: 8px;
+    }
+    .SF-item-mode {
+      flex: 1;
+      .ant-picker {
+        background-color: var(--xc-component-background);
+      }
+      .ant-select {
+        width: 100%;
       }
     }
+    .SF-item-modeCheckbox {
+      margin-top: 5px;
+    }
   }
+  .SF-itemBtns {
+    text-align: right;
+    .SF-itemBtns-reset {
+      margin-right: 10px;
+    }
+  }
+}

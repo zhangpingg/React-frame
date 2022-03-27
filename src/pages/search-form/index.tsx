@@ -1,59 +1,74 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef, useReducer } from 'react';
 import { Table, Pagination } from 'antd';
 import debounce from 'lodash/debounce';
 import SearchForm, { IItems } from './search-form'
 import CascaderTree from './components/cascader-tree'
+import { ILoadings } from './interface'
+import { STATUS, TASK_STATUS } from './const'
 
 interface IListItem {
   id: number
   a: string
   b: string
 }
+// interface IFlags {
+//   a: boolean
+//   b: boolean
+// }
+
 
 const Index = () => {
-  const defaultParams = {b: 'success'};
-  const [loading, setLoading] = useState<boolean>(false)
+  const defaultParams = { b: 'success' }
+  const screenRef = useRef<HTMLDivElement | null>(null)
+  // const [flags, dispatchFlags] = useReducer((prev: IFlags, data: IFlags) => ({ ...prev, ...data }), {
+  //   a: false,
+  //   b: false,
+  // })
+  const [loadings, dispatchLoadings] = useReducer((prev: ILoadings, data: ILoadings) => ({ ...prev, ...data }), {
+    table: false,
+    reset: false,
+    search: false,
+  })
   const [params, setParams] = useState({})
   const [pageNo, setPageNo] = useState<number>(1)
   const [pageSize, setPageSize] = useState<number>(10)
   const [list, setList] = useState<IListItem[]>([])
   const [total, setTotal] = useState<number>(0);
   const [bodyHeight, setBodyHeight] = useState<number>(document.body.clientHeight)
+  const [screenHeight, setScreenHeight] = useState(screenRef?.current?.clientHeight || 0);
 
   /** 筛选条件 */
   const items: IItems[] = useMemo(() => {
     return [
       {
         type: 'input',
+        label: '名称',
         propKey: 'a',
-        placeholder: '名称1',
+        placeholder: '请输入',
       },
       {
         type: 'select',
+        label: '状态',
         propKey: 'b',
-        placeholder: '类型',
-        options: [
-          { label: '失败', value: 'fail' },
-          { label: '成功', value: 'success' },
-        ],
+        placeholder: '请选择',
+        options: STATUS,
       },
       {
         component: CascaderTree,
+        label: '市级',
         propKey: 'c',
-        placeholder: '客户类型',
+        placeholder: '请选择',
       },
       {
         type: 'datePicker',
+        label: '日期',
         propKey: 'd',
-        placeholder: '名称d',
+        placeholder: '请选择',
       },
       {
         type: 'checkbox',
         propKey: 'e',
-        options: [
-          { label: '未做', value: '0' },
-          { label: '已完成', value: '1' },
-        ],
+        options: TASK_STATUS,
       },
     ]
   }, [])
@@ -72,22 +87,24 @@ const Index = () => {
   }, [])
   /** 获取数据 */
   const getList = useCallback((params) => {
-    setLoading(true)
-    console.log('params:', params)
-    let data = [
-      { id: 1, a: '张三', b: 'success' },
-      { id: 2, a: '李四', b: 'fail' },
-      { id: 3, a: '王五', b: 'success' }
-    ]
-    setList(data)
-    setTotal(100)
-    setLoading(false)
+    dispatchLoadings({ table: true })
+    setTimeout(() => {
+      console.log('params:', params)
+      let data = [
+        { id: 1, a: '张三', b: 'success' },
+        { id: 2, a: '李四', b: 'fail' },
+        { id: 3, a: '王五', b: 'success' }
+      ]
+      setList(data)
+      setTotal(100)
+      dispatchLoadings({ table: false, reset: false, search: false, })
+    }, 1000)
   }, [])
   /** 修改筛选条件 */
   const updateScreen = useCallback((data) => {
     const { x, ...lastProps } = data;
     return {
-      // a: a ? a + '——字段若是数组对象等，可取中某个值' : '',
+      // a: a ? a + ':字段若是数组对象等，可取中某个值' : '',
       x: 1,
       ...lastProps
     }
@@ -109,6 +126,7 @@ const Index = () => {
   }, [params])
   /** 查询 */
   const search = useCallback(async (data) => {
+    dispatchLoadings({ search: true })
     setParams(data);
     setPageNo(1)
     setPageSize(10)
@@ -121,6 +139,7 @@ const Index = () => {
   }, [pageNo, pageSize]);
   /** 重置 */
   const reset = useCallback(() => {
+    dispatchLoadings({ reset: true })
     setPageNo(1);
     setPageSize(10);
     let _params = {
@@ -133,11 +152,14 @@ const Index = () => {
   /** 屏幕缩放 */
   const windowScroll = useCallback(() => {
     setBodyHeight(document.body.clientHeight)
+    if (screenRef?.current) {
+      setScreenHeight(screenRef?.current?.clientHeight)
+    }
   }, [])
 
   useEffect(() => {
     windowScroll()
-    window.addEventListener('resize', debounce(windowScroll, 500))
+    window.addEventListener('resize', debounce(windowScroll, 300))
     return () => {
       window.removeEventListener('resize', windowScroll)
     }
@@ -145,23 +167,27 @@ const Index = () => {
 
   return (
     <div>
-      <h2>动态筛选条件</h2>
-      <SearchForm
-        items={items}
-        onUpdateScreen={updateScreen}
-        onSearch={search}
-        onReset={reset}
-        defaultParams={defaultParams}
-      />
-      <div style={{ height: bodyHeight - 150, border: '1px solid #f00' }}>
+      <div ref={screenRef}>
+        <SearchForm
+          items={items}
+          defaultParams={defaultParams}
+          resetLoading={loadings.reset}
+          searchLoading={loadings.search}
+          col={[6, 18]}
+          onUpdateScreen={updateScreen}
+          onSearch={search}
+          onReset={reset}
+        />
+      </div>
+      <div style={{ height: bodyHeight - screenHeight - 60, border: '1px solid #f00' }}>
         <Table
           rowKey='id'
           columns={columns}
           dataSource={list}
           pagination={false}
-          loading={loading}
+          loading={loadings.table}
           scroll={{
-            y: bodyHeight - 216
+            y: bodyHeight - screenHeight - 125
           }}
         />
       </div>

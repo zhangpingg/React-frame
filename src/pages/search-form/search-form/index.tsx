@@ -1,26 +1,43 @@
-import { Input, Button, Select, DatePicker, Checkbox } from 'antd';
-import { useCallback, useEffect, useReducer } from 'react';
-import './style.scss';
+import React, { useState, useCallback, useEffect, useReducer } from 'react';
+import { Input, Button, Select, DatePicker, Checkbox, Row, Col } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 import { useUpdateEffect, useDebounceFn } from 'ahooks';
+import debounce from 'lodash/debounce';
+import './style.scss';
+
 
 export interface IItems {
   type?: 'input' | 'select' | 'datePicker' | 'checkbox'
+  label?: string
   propKey: string
   placeholder?: string
   options?: Array<{ value: any, label: string }>
+  /** 自定义组件 */
   component?: React.ElementType,
+  /** 自定义属性 */
   props?: any
 }
 interface IProps {
   items: IItems[]
+  /** 更新查询条件 */
   onUpdateScreen: (data: object) => void
+  /** 查询 */
   onSearch: (data: object) => void
+  /** 重置 */
   onReset?: () => void
+  /** 默认参数 */
   defaultParams?: object
+  /** 左右分布情况 */
+  col?: number[]
+  /** reset按钮加载 */
+  resetLoading?: boolean
+  /** search按钮加载 */
+  searchLoading?: boolean
 }
 
 const Index: React.FC<IProps> = (props) => {
-  const { defaultParams = {} } = props
+  const [isHasReset, setIsHasReset] = useState<boolean>(false);
+  const { defaultParams = {}, col = [6, 6], resetLoading = false, searchLoading = false } = props;
   const [formData, dispatch] = useReducer((prev: any, data: any) => (data ? { ...prev, ...data } : defaultParams), defaultParams);
   const [searchData, setSearchData] = useReducer(
     (prev: any, data: any) => (data ? { ...prev, ...data } : props.onUpdateScreen(defaultParams)),
@@ -29,14 +46,16 @@ const Index: React.FC<IProps> = (props) => {
 
   /** formData 数据改变时，修改真正筛选条件字段 */
   useUpdateEffect(() => {
-    setSearchData(props.onUpdateScreen(formData))
-  }, [formData]);
+    setSearchData(isHasReset ? null : props.onUpdateScreen(formData));
+  }, [formData, isHasReset]);
   /** 查询 */
   const search = useCallback(() => {
+    setIsHasReset(false);
     props.onSearch(searchData)
   }, [searchData])
   /** 重置 */
   const reset = useCallback(() => {
+    setIsHasReset(true);
     dispatch(null)
     props?.onReset?.();
   }, [])
@@ -46,71 +65,95 @@ const Index: React.FC<IProps> = (props) => {
   }, [])
 
   return (
-    <div className='search'>
-      {
-        props.items.map((item) => {
-          if (item.component) {
-            const Type = item.component;
-            return (
-              <div className="search-item" key={item.propKey}>
-                <Type
-                  placeholder={item.placeholder}
-                  {...item.props}
-                  value={formData[item.propKey]}
-                  onChange={(v: any) => dispatch({ [item.propKey]: v })}
-                />
-              </div>
-            )
-          }
-          switch (item.type) {
-            case 'input':
+    <div className='SF'>
+      <Row>
+        {
+          props.items && props.items.map((item) => {
+            if (item.component) {
+              const Type = item.component;
               return (
-                <div className='search-item' key={item.propKey}>
-                  <Input
-                    placeholder={item.placeholder}
-                    value={formData?.[item.propKey]}
-                    onChange={(e) => dispatch({ [item.propKey]: e.target.value })} />
-                </div>
-              )
-            case 'select':
-              return (
-                <div className='search-item' key={item.propKey}>
-                  <Select
-                    placeholder={item.placeholder}
-                    value={formData?.[item.propKey]}
-                    onChange={(v) => dispatch({ [item.propKey]: v })}>
-                    {item.options?.map((c) => (
-                      <Select.Option value={c.value} key={c.value}>{c.label}</Select.Option>
-                    ))}
-                  </Select>
-                </div>
-              )
-            case 'datePicker':
-              return (
-                <div className='search-item' key={item.propKey}>
-                  <DatePicker
-                    placeholder={item.placeholder}
-                    value={formData?.[item.propKey]}
-                    onChange={(v) => dispatch({ [item.propKey]: v })}
-                    format='YYYY-MM-DD'
-                  />
-                </div>
-              )
-            case 'checkbox':
-              return (
-                <div className='search-item' key={item.propKey}>
-                  <Checkbox.Group
-                    options={item.options}
-                    value={formData?.[item.propKey]}
-                    onChange={(v) => dispatch({ [item.propKey]: v })}
-                  />
-                </div>
-              )
-          }
-        })
-      }
-      <Button type="primary" onClick={search}>查询</Button>
-      <Button onClick={reset}>重置</Button>
+                <Col span={col[0]} className="SF-item" key={item.propKey}>
+                  <span className="SF-item-label">{item.label}</span>
+                  <div className="SF-item-mode">
+                    <Type
+                      placeholder={item.placeholder}
+                      {...item.props}
+                      value={formData[item.propKey]}
+                      onChange={(v: any) => dispatch({ [item.propKey]: v })}
+                    />
+                  </div>
+                </Col>
+              );
+            }
+            switch (item.type) {
+              case 'input':
+                return (
+                  <Col span={col[0]} className="SF-item" key={item.propKey}>
+                    <span className="SF-item-label">{item.label}</span>
+                    <Input
+                      allowClear
+                      placeholder={item.placeholder}
+                      value={formData?.[item.propKey]}
+                      onChange={(e) => dispatch({ [item.propKey]: e.target.value })}
+                      className="SF-item-mode"
+                      suffix={<SearchOutlined style={{ color: 'rgba(0,0,0,.45)' }} />}
+                    />
+                  </Col>
+                );
+              case 'select':
+                return (
+                  <Col span={col[0]} className="SF-item" key={item.propKey}>
+                    <span className="SF-item-label">{item.label}</span>
+                    <Select
+                      allowClear
+                      placeholder={item.placeholder}
+                      value={formData?.[item.propKey]}
+                      {...item.props}
+                      onChange={(v) => dispatch({ [item.propKey]: v })}
+                      className="SF-item-mode"
+                    >
+                      {item.options?.map((c) => (
+                        <Select.Option value={c.value} key={c.value}>{c.label}</Select.Option>
+                      ))}
+                    </Select>
+                  </Col>
+                );
+              case 'datePicker':
+                return (
+                  <Col span={col[0]} className="SF-item" key={item.propKey}>
+                    <span className="SF-item-label">{item.label}</span>
+                    <DatePicker
+                      allowClear
+                      placeholder={item.placeholder}
+                      value={formData?.[item.propKey]}
+                      onChange={(v) => dispatch({ [item.propKey]: v })}
+                      format="YYYY-MM-DD"
+                      className="SF-item-mode"
+                    />
+                  </Col>
+                );
+              case 'checkbox':
+                return (
+                  <Col span={col[0]} className="SF-item" key={item.propKey}>
+                    <span className="SF-item-label">{item.label}</span>
+                    <Checkbox.Group
+                      value={formData?.[item.propKey]}
+                      options={item.options}
+                      onChange={(v) => dispatch({ [item.propKey]: v })}
+                      className="SF-item-mode SF-item-modeCheckbox"
+                    />
+                  </Col>
+                );
+              default:
+                break;
+            }
+          })
+        }
+        <Col span={col[1]} className="SF-itemBtns">
+          <Button type="primary" loading={searchLoading} onClick={debounce(search, 300)}>查询</Button>
+          <Button className="SF-itemBtns-reset" loading={resetLoading} onClick={debounce(reset, 300)}>重置</Button>
+        </Col>
+      </Row>
     </div>
   )
 }
