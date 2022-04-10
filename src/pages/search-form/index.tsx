@@ -18,7 +18,7 @@ interface IListItem {
 
 
 const Index = () => {
-  const defaultParams = { b: 'success' }
+  const defaultParams = { b: [1] }
   const screenRef = useRef<HTMLDivElement | null>(null)
   // const [flags, dispatchFlags] = useReducer((prev: IFlags, data: IFlags) => ({ ...prev, ...data }), {
   //   a: false,
@@ -52,6 +52,11 @@ const Index = () => {
         propKey: 'b',
         placeholder: '请选择',
         options: STATUS,
+        selectLablelLength: 3,
+        props: {
+          mode: 'multiple',
+          maxTagCount: 1
+        }
       },
       {
         component: CascaderTree,
@@ -142,6 +147,7 @@ const Index = () => {
     dispatchLoadings({ reset: true })
     setPageNo(1);
     setPageSize(10);
+    setParams(defaultParams);
     let _params = {
       pageNo: 1,
       pageSize: 10,
@@ -158,6 +164,7 @@ const Index = () => {
   }, [])
 
   useEffect(() => {
+    console.log(11, STATUS)
     windowScroll()
     window.addEventListener('resize', debounce(windowScroll, 300))
     return () => {

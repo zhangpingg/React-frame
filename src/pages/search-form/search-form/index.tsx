@@ -15,7 +15,9 @@ export interface IItems {
   /** 自定义组件 */
   component?: React.ElementType,
   /** 自定义属性 */
-  props?: any
+  props?: any,
+  /** select下拉label截取的长度 */
+  selectLablelLength?: number,
 }
 interface IProps {
   items: IItems[]
@@ -111,9 +113,11 @@ const Index: React.FC<IProps> = (props) => {
                       {...item.props}
                       onChange={(v) => dispatch({ [item.propKey]: v })}
                       className="SF-item-mode"
+                      optionLabelProp="label"
+                      filterOption={(input, option: any) => (option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0)}
                     >
                       {item.options?.map((c) => (
-                        <Select.Option value={c.value} key={c.value}>{c.label}</Select.Option>
+                        <Select.Option label={c.label.substring(0, item.selectLablelLength || 4)} value={c.value} key={c.value}>{c.label}</Select.Option>
                       ))}
                     </Select>
                   </Col>
