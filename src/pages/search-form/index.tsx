@@ -5,6 +5,7 @@ import SearchForm, { IItems } from './search-form'
 import CascaderTree from './components/cascader-tree'
 import { ILoadings } from './interface'
 import { STATUS, TASK_STATUS } from './const'
+import './styles.less';
 
 interface IListItem {
   id: number
@@ -18,7 +19,6 @@ interface IListItem {
 
 
 const Index = () => {
-  const defaultParams = { b: [1] }
   const screenRef = useRef<HTMLDivElement | null>(null)
   // const [flags, dispatchFlags] = useReducer((prev: IFlags, data: IFlags) => ({ ...prev, ...data }), {
   //   a: false,
@@ -37,6 +37,10 @@ const Index = () => {
   const [bodyHeight, setBodyHeight] = useState<number>(document.body.clientHeight)
   const [screenHeight, setScreenHeight] = useState(screenRef?.current?.clientHeight || 0);
 
+  /** 默认参数 */
+  const defaultParams = useMemo(() => ({
+    b: [1],
+  }), []);
   /** 筛选条件 */
   const items: IItems[] = useMemo(() => {
     return [
@@ -123,12 +127,12 @@ const Index = () => {
       ...params
     }
     getList(_params);
-  }, [params]);
+  }, [params, getList]);
   /** 更新页码 */
   const changePageSize1 = useCallback((index, size) => {
     setPageNo(index)
     setPageSize(size)
-  }, [params])
+  }, [])
   /** 查询 */
   const search = useCallback(async (data) => {
     dispatchLoadings({ search: true })
@@ -141,7 +145,7 @@ const Index = () => {
       ...data
     }
     getList(_params)
-  }, [pageNo, pageSize]);
+  }, [getList]);
   /** 重置 */
   const reset = useCallback(() => {
     dispatchLoadings({ reset: true })
@@ -154,7 +158,7 @@ const Index = () => {
       ...defaultParams
     }
     getList(_params)
-  }, []);
+  }, [defaultParams, getList]);
   /** 屏幕缩放 */
   const windowScroll = useCallback(() => {
     setBodyHeight(document.body.clientHeight)
@@ -170,10 +174,10 @@ const Index = () => {
     return () => {
       window.removeEventListener('resize', windowScroll)
     }
-  }, [])
+  }, [windowScroll])
 
   return (
-    <div>
+    <div className='SF_wrap'>
       <div ref={screenRef}>
         <SearchForm
           items={items}
@@ -194,7 +198,8 @@ const Index = () => {
           pagination={false}
           loading={loadings.table}
           scroll={{
-            y: bodyHeight - screenHeight - 125
+            y: bodyHeight - screenHeight - 125,
+            x: 1500
           }}
         />
       </div>

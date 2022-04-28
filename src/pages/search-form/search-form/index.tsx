@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, useReducer } from 'react';
 import { Input, Button, Select, DatePicker, Checkbox, Row, Col } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import { useUpdateEffect, useDebounceFn } from 'ahooks';
+import { useUpdateEffect } from 'ahooks';
 import debounce from 'lodash/debounce';
 import './style.less';
 
@@ -38,6 +38,7 @@ interface IProps {
 }
 
 const Index: React.FC<IProps> = (props) => {
+  const { onSearch, onReset } = props;
   const [isHasReset, setIsHasReset] = useState<boolean>(false);
   const { defaultParams = {}, col = [6, 6], resetLoading = false, searchLoading = false } = props;
   const [formData, dispatch] = useReducer((prev: any, data: any) => (data ? { ...prev, ...data } : defaultParams), defaultParams);
@@ -53,18 +54,18 @@ const Index: React.FC<IProps> = (props) => {
   /** 查询 */
   const search = useCallback(() => {
     setIsHasReset(false);
-    props.onSearch(searchData)
-  }, [searchData])
+    onSearch(searchData)
+  }, [searchData, onSearch])
   /** 重置 */
   const reset = useCallback(() => {
     setIsHasReset(true);
     dispatch(null)
-    props?.onReset?.();
-  }, [])
+    onReset?.();
+  }, [onReset])
 
   useEffect(() => {
     search();
-  }, [])
+  }, [search])
 
   return (
     <div className='SF'>
@@ -151,6 +152,7 @@ const Index: React.FC<IProps> = (props) => {
               default:
                 break;
             }
+            return '默认值';
           })
         }
         <Col span={col[1]} className="SF-itemBtns">
