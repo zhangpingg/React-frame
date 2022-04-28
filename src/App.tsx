@@ -1,4 +1,5 @@
 import React from 'react';
+import './app.less'
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import Home from './pages/home'
 import Form from './pages/antd/form'

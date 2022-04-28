@@ -3,7 +3,7 @@ import { Input, Button, Select, DatePicker, Checkbox, Row, Col } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useUpdateEffect, useDebounceFn } from 'ahooks';
 import debounce from 'lodash/debounce';
-import './style.scss';
+import './style.less';
 
 
 export interface IItems {

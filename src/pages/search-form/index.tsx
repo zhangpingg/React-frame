@@ -122,8 +122,8 @@ const Index = () => {
       pageSize: size,
       ...params
     }
-    getList(_params)
-  }, [pageSize, params])
+    getList(_params);
+  }, [params]);
   /** 更新页码 */
   const changePageSize1 = useCallback((index, size) => {
     setPageNo(index)
