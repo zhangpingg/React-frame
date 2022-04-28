@@ -75,7 +75,7 @@ const EditableCell = ({
 };
 
 
-const CustomWeight = () => {
+const EditCell = () => {
   const [dataSource, setDataSource] = useState([
     {
       key: '0',
@@ -161,4 +161,4 @@ const CustomWeight = () => {
   )
 }
 
-export default CustomWeight;
+export default EditCell;
