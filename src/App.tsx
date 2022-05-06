@@ -7,6 +7,7 @@ import EditCell from './pages/antd/editCell'
 import MergeEditCell from './pages/antd/mergeEditCell'
 import SearchFrom from './pages/search-form'
 import ParentToChildFn from './pages/parentToChildFn'
+import DragList from './pages/dragList'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/mergeEditCell" element={<MergeEditCell />} />
         <Route path="/searchFrom" element={<SearchFrom />} />
         <Route path="/parentToChildFn" element={<ParentToChildFn />} />
+        <Route path="/dragList" element={<DragList />} />
       </Routes>
     </Router>
   );
