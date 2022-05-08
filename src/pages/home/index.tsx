@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 const Home = () => {
   return (
     <div>
+      <Link to="/test">test</Link>: 测试 <br />
       <Link to="/form">form</Link>: form表单 <br />
       <Link to="/editCell">editCell</Link>: 编辑单元格 <br />
       <Link to="/mergeEditCell">mergeEditCell</Link>: 合并编辑单元格 <br />
