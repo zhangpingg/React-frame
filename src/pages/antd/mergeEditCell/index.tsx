@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef, useContext } from 'react';
 import { Table, Form, InputNumber } from 'antd';
-import {  useMemoizedFn } from 'ahooks';
+import { useMemoizedFn } from 'ahooks';
 import debounce from 'lodash/debounce';
 
 const data = [
@@ -8,7 +8,8 @@ const data = [
     id: 1,
     a1Content: '一级内容1',
     a1Weight: 1,
-    a1WeightContent: null,
+    a1WeightContent: 0,
+    a1WeightContentOld: 0,      // 前端自循环，保存一份旧值，方便提交的时候，比较前后是否修改，下面同理
     b2Content: '二级内容1',
     b2Weight: 2,
     b2WeightContent: 12,
@@ -18,8 +19,8 @@ const data = [
     d4Content: '四级内容1',
     d4Weight: 4,
     d4WeightContent: 14,
-    edited: false,
-    editType: [],
+    edited: false,              // 是否有编辑的权限
+    editType: [],               // 哪些列可以编辑，编辑的时候会追加到该字段中
   },
   {
     id: 2,
@@ -108,7 +109,7 @@ const data = [
   }
 ];
 
-const EditableContext:any = React.createContext(null);
+const EditableContext: any = React.createContext(null);
 
 const EditableRow = ({ ...props }) => {
   const [form] = Form.useForm();
@@ -130,8 +131,8 @@ const EditableCell = ({
   ...restProps
 }: any) => {
   const [editing, setEditing] = useState(false);
-  const inputRef:any = useRef(null);
-  const form:any = useContext(EditableContext);
+  const inputRef: any = useRef(null);
+  const form: any = useContext(EditableContext);
 
   useEffect(() => {
     if (editing) {
@@ -203,7 +204,7 @@ const MergeEditCell = () => {
       key: 'a1Content',
       dataIndex: 'a1Content',
       onCell: (record: any) => ({
-        rowSpan: record.rowSpana1Content,
+        rowSpan: record.rowSpana1Weight,
       }),
       render: (text: string) => (<span>{text}</span>),
     },
@@ -218,7 +219,7 @@ const MergeEditCell = () => {
       key: 'b2Content',
       dataIndex: 'b2Content',
       onCell: (record: any) => ({
-        rowSpan: record.rowSpanb2Content,
+        rowSpan: record.rowSpanb2Weight,
       }),
       render: (text: string) => (<span>{text}</span>)
     },
@@ -233,7 +234,7 @@ const MergeEditCell = () => {
       key: 'c3Content',
       dataIndex: 'c3Content',
       onCell: (record: any) => ({
-        rowSpan: record.rowSpanc3Content,
+        rowSpan: record.rowSpanc3Weight,
       }),
       render: (text: string) => (<span>{text}</span>)
     },
@@ -248,7 +249,7 @@ const MergeEditCell = () => {
       key: 'd4Content',
       dataIndex: 'd4Content',
       onCell: (record: any) => ({
-        rowSpan: record.rowSpand4Content,
+        rowSpan: record.rowSpand4Weight,
       }),
       render: (text: string) => (<span>{text}</span>)
     },
@@ -260,7 +261,7 @@ const MergeEditCell = () => {
     },
   ], []);
   /** 合并单元格 */
-  const mergeCell =  useMemoizedFn((cellList: any[], mergeType: string) => {
+  const mergeCell = useMemoizedFn((cellList: any[], mergeType: string) => {
     const mergeTypeMap = cellList.reduce((prev: any, curr: any) => {
       const prevX = { ...prev };
       if (prevX[curr[mergeType]]) {
@@ -301,7 +302,7 @@ const MergeEditCell = () => {
     setBodyHeight(document.body.clientHeight);
   }, []);
   /** 编辑后保存 */
-  const handleSave =  useMemoizedFn((row) => {
+  const handleSave = useMemoizedFn((row) => {
     const newData = [...dataSource];
     const index = newData.findIndex((item) => row.id === item.id);
     const item = newData[index];
@@ -336,7 +337,7 @@ const MergeEditCell = () => {
   }, [initColumns, handleSave]);
 
   useEffect(() => {
-    setDataSource(transFormData(data, ['a1Content', 'a1Weight', 'b2Content', 'b2Weight', 'c3Content', 'c3Weight', 'd4Content', 'd4Weight']));
+    setDataSource(transFormData(data, ['a1Weight', 'b2Weight', 'c3Weight', 'd4Weight']));
     window.addEventListener('resize', debounce(setScroll, 300));
     setScroll();
     transformColumns();
