@@ -94,9 +94,9 @@ const DragList = () => {
         onDragStart={handleDragStart}
       >
         <SortableContext items={items} strategy={verticalListSortingStrategy}>
-          {items.map((item) => {
+          {items.map((item, index) => {
             return (
-              <div key={item.id} style={{ opacity: item.id === activeId ? 0 : 1 }}>
+              <div key={index} style={{ opacity: item.id === activeId ? 0 : 1 }}>
                 <SortableItem key={item.id} id={item.id}>
                   {item.content}
                 </SortableItem>
