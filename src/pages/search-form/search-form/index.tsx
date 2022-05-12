@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect, useReducer } from 'react';
 import { Input, Button, Select, DatePicker, Checkbox, Row, Col } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
 import { useUpdateEffect } from 'ahooks';
 import debounce from 'lodash/debounce';
 import './style.less';
@@ -65,7 +64,7 @@ const Index: React.FC<IProps> = (props) => {
 
   useEffect(() => {
     search();
-  }, [search])
+  }, [])
 
   return (
     <div className='SF'>
@@ -99,7 +98,6 @@ const Index: React.FC<IProps> = (props) => {
                       value={formData?.[item.propKey]}
                       onChange={(e) => dispatch({ [item.propKey]: e.target.value })}
                       className="SF-item-mode"
-                      suffix={<SearchOutlined style={{ color: 'rgba(0,0,0,.45)' }} />}
                     />
                   </Col>
                 );

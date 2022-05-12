@@ -3,6 +3,7 @@ import { Table, Pagination } from 'antd';
 import debounce from 'lodash/debounce';
 import SearchForm, { IItems } from './search-form'
 import CascaderTree from './components/cascader-tree'
+import SectionFraction from './components/sectionFraction'
 import { ILoadings } from './interface'
 import { STATUS, TASK_STATUS } from './const'
 import './styles.less';
@@ -79,6 +80,11 @@ const Index = () => {
         propKey: 'e',
         options: TASK_STATUS,
       },
+      {
+        component: SectionFraction,
+        label: '分数',
+        propKey: 'f',
+      }
     ]
   }, [])
   /** table 列头 */
@@ -168,7 +174,6 @@ const Index = () => {
   }, [])
 
   useEffect(() => {
-    console.log(11, STATUS)
     windowScroll()
     window.addEventListener('resize', debounce(windowScroll, 300))
     return () => {
@@ -184,7 +189,7 @@ const Index = () => {
           defaultParams={defaultParams}
           resetLoading={loadings.reset}
           searchLoading={loadings.search}
-          col={[6, 18]}
+          col={[6, 12]}
           onUpdateScreen={updateScreen}
           onSearch={search}
           onReset={reset}
