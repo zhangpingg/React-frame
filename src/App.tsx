@@ -10,6 +10,8 @@ import UploadFile from './pages/antd/uploadFile'
 import SearchFrom from './pages/search-form'
 import ParentToChildFn from './pages/parentToChildFn'
 import DragList from './pages/dragList'
+import DomSize from './pages/hookDemo/domSize'
+import SetIntervalDemo from './pages/hookDemo/setIntervalDemo'
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
         <Route path="/searchFrom" element={<SearchFrom />} />
         <Route path="/parentToChildFn" element={<ParentToChildFn />} />
         <Route path="/dragList" element={<DragList />} />
+        <Route path="/domSize" element={<DomSize />} />
+        <Route path="/setIntervalDemo" element={<SetIntervalDemo />} />
       </Routes>
     </Router>
   );

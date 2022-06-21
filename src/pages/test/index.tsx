@@ -1,8 +1,12 @@
 import React from 'react'
+import styles from './index.module.less';
 
 const Test = () => {
+  
   return (
-    <div>test</div>
+    <div className={styles.t}>
+      11
+    </div>
   )
 }
 
