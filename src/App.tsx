@@ -5,6 +5,7 @@ import Home from './pages/home'
 import Test from './pages/test'
 import Form from './pages/antd/form'
 import EditCell from './pages/antd/editCell'
+import EditCellSelect from './pages/antd/editCellSelect'
 import MergeEditCell from './pages/antd/mergeEditCell'
 import UploadFile from './pages/antd/uploadFile'
 import SearchFrom from './pages/search-form'
@@ -21,6 +22,7 @@ function App() {
         <Route path="/test" element={<Test />} />
         <Route path="/form" element={<Form />} />
         <Route path="/editCell" element={<EditCell />} />
+        <Route path="/editCellSelect" element={<EditCellSelect />} />
         <Route path="/mergeEditCell" element={<MergeEditCell />} />
         <Route path="/uploadFile" element={<UploadFile />} />
         <Route path="/searchFrom" element={<SearchFrom />} />

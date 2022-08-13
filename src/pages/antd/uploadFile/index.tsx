@@ -26,7 +26,7 @@ const UploadFile = () => {
   ])
 
   /** 按钮上传 */
-  const uploadProps1:UploadProps = {
+  const uploadProps1: UploadProps = {
     name: 'file',
     action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
     headers: {
@@ -63,24 +63,22 @@ const UploadFile = () => {
     fileList: fileList2,
   };
   /** 点击/拖拽-上传 */
-  const uploadProps3:UploadProps = {
+  const uploadProps3: UploadProps = {
     name: 'file',
     multiple: true,
     action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
     onChange(info: any) {
-      if (info.file.status === 'removed') {         // 移除
-        setFileList2(info.fileList)
-      }
-      if (info.file.status === 'uploading') {
-        setFileList2(info.fileList)
-      }
-      if (info.file.status === 'done') {
-        setFileList2(info.fileList)
-      } else if (info.file.status === 'error') {
-        console.log('失败: ', info.file)
+      switch (info.file.status) {
+        case 'removed':
+        case 'uploading':
+        case 'done':
+          setFileList2(info.fileList)
+          break;
+        case 'error':
+          console.log('失败: ', info.file)
       }
     },
-    onDrop() {},
+    onDrop() { },
     fileList: fileList2,
   };
 
