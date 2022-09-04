@@ -8,6 +8,7 @@ import EditCell from './pages/antd/editCell'
 import EditCellSelect from './pages/antd/editCellSelect'
 import MergeEditCell from './pages/antd/mergeEditCell'
 import UploadFile from './pages/antd/uploadFile'
+import PageSelect from './pages/antd/pageSelect'
 import SearchFrom from './pages/search-form'
 import ParentToChildFn from './pages/parentToChildFn'
 import DragList from './pages/dragList'
@@ -25,6 +26,7 @@ function App() {
         <Route path="/editCellSelect" element={<EditCellSelect />} />
         <Route path="/mergeEditCell" element={<MergeEditCell />} />
         <Route path="/uploadFile" element={<UploadFile />} />
+        <Route path="/pageSelect" element={<PageSelect />} />
         <Route path="/searchFrom" element={<SearchFrom />} />
         <Route path="/parentToChildFn" element={<ParentToChildFn />} />
         <Route path="/dragList" element={<DragList />} />

@@ -3,7 +3,7 @@
  * @description 监听 dom 大小改变，返回当前元素本身
  */
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 const useDomChangeSize = (sizeRef: any, cb: (v: any) => void) => {
 

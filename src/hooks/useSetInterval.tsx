@@ -1,6 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-
-let timer: any = null;
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface IProps {
   callback: () => void;
