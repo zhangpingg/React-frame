@@ -10,7 +10,6 @@ import MergeEditCell from './pages/antd/mergeEditCell'
 import UploadFile from './pages/antd/uploadFile'
 import PageSelect from './pages/antd/pageSelect'
 import SearchFrom from './pages/search-form'
-import ParentToChildFn from './pages/parentToChildFn'
 import DragList from './pages/dragList'
 import DomSize from './pages/hookDemo/domSize'
 import SetIntervalDemo from './pages/hookDemo/setIntervalDemo'
@@ -28,7 +27,6 @@ function App() {
         <Route path="/uploadFile" element={<UploadFile />} />
         <Route path="/pageSelect" element={<PageSelect />} />
         <Route path="/searchFrom" element={<SearchFrom />} />
-        <Route path="/parentToChildFn" element={<ParentToChildFn />} />
         <Route path="/dragList" element={<DragList />} />
         <Route path="/domSize" element={<DomSize />} />
         <Route path="/setIntervalDemo" element={<SetIntervalDemo />} />
